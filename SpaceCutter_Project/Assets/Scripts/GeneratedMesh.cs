@@ -35,4 +35,19 @@ public class GeneratedMesh
             _SubMeshIndices[triangle.SubMeshIndex].Add(currentVerticeCount + i);
         }
     }
+    public Mesh GetGeneratedMesh()
+    {
+        Mesh mesh = new Mesh();
+        mesh.SetVertices(_Vertices);
+        mesh.SetNormals(_Normals);
+        mesh.SetUVs(0, _UVs);
+        mesh.SetUVs(1, _UVs);
+
+        mesh.subMeshCount = _SubMeshIndices.Count;
+        for (int i = 0; i < _SubMeshIndices.Count; i++)
+        {
+            mesh.SetTriangles(_SubMeshIndices[i], i);
+        }
+        return mesh;
+    }
 }
