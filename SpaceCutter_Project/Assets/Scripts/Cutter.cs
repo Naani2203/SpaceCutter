@@ -18,7 +18,7 @@ public class Cutter
         IsCurrentlyCutting = true;
 
         Plane plane = new Plane((originalGameObject.transform.InverseTransformDirection(- direction)), originalGameObject.transform.InverseTransformPoint(contactPoint));
-        OriginalMesh = originalGameObject.GetComponent<MeshFilter>().mesh;
+        OriginalMesh = originalGameObject.GetComponentInChildren<MeshFilter>().mesh;
         List<Vector3> addedVertices = new List<Vector3>();
 
         GeneratedMesh leftMesh = new GeneratedMesh();
@@ -66,6 +66,8 @@ public class Cutter
         Mesh finishedRightMesh = rightMesh.GetGeneratedMesh();
 
         originalGameObject.GetComponent<MeshFilter>().mesh = finishedLeftMesh;
+        MeshCollider leftMC = originalGameObject.GetComponent<MeshCollider>();
+        if(leftMC==null)
         originalGameObject.AddComponent<MeshCollider>().sharedMesh = finishedLeftMesh;
         originalGameObject.GetComponent<MeshCollider>().convex = true;
 
@@ -89,13 +91,18 @@ public class Cutter
         rightGO.GetComponent<MeshRenderer>().materials = mats;
 
         rightGO.AddComponent<MeshFilter>().mesh = finishedRightMesh;
-
-        rightGO.AddComponent<MeshCollider>().sharedMesh = finishedRightMesh;
+        MeshCollider rightMC = rightGO.GetComponent<MeshCollider>();
+        if (rightMC == null)
+            rightGO.AddComponent<MeshCollider>().sharedMesh = finishedRightMesh;
         rightGO.GetComponent<MeshCollider>().convex = true;
+        rightGO.tag = "Cut";
 
         if (canAddRigidBody == true)
         {
-            rightGO.AddComponent<Rigidbody>();
+            Rigidbody rb = rightGO.AddComponent<Rigidbody>();
+            rb.mass = 10000;
+            rb.drag = 2;
+           
         }
 
         IsCurrentlyCutting = false;

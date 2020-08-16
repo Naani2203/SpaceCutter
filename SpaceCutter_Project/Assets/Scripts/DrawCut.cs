@@ -8,7 +8,10 @@ public class DrawCut : MonoBehaviour
     Vector3 pointB;
     
     Camera cam;
+    [HideInInspector]
     public GameObject obj;
+    public Material Mat;
+    public  bool IsVertical;
 
     void Start() {
         cam = GetComponent<Camera>();
@@ -18,15 +21,38 @@ public class DrawCut : MonoBehaviour
     {
         Vector3 mouse = Input.mousePosition;
         mouse.z = -cam.transform.position.z;
+        if (Input.GetMouseButtonDown(0)) 
+        {
+            RaycastHit hitInfo = new RaycastHit();
+            bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
+            if (hit)
+            {                
+                if (hitInfo.transform.gameObject.tag == "Cut")
+                {
+                    obj = hitInfo.transform.gameObject;
+                }
 
-        if (Input.GetMouseButtonDown(0)) {
-            pointA = cam.ScreenToWorldPoint(mouse);
-            
+                pointA = cam.ScreenToWorldPoint(mouse);
+                if (IsVertical)
+                {
+                    pointB = new Vector3(pointA.x, pointA.y + 2, pointA.z);
+                }
+                else
+                {
+                    pointB = new Vector3(pointA.x + 2, pointA.y, pointA.z);
+                }
+            }
+                CreateSlicePlane();
         }
-        if (Input.GetMouseButtonUp(0)) {
-            pointB = cam.ScreenToWorldPoint(mouse);
-            CreateSlicePlane();
+        if(Input.GetKeyDown(KeyCode.T))
+        {
+            if (!IsVertical)
+                IsVertical = true;
+            else
+                IsVertical = false;
         }
+
+       
     }
 
     void CreateSlicePlane() {
@@ -34,6 +60,6 @@ public class DrawCut : MonoBehaviour
         Vector3 up = Vector3.Cross((pointA-pointB),(pointA-cam.transform.position)).normalized;
         
         
-        Cutter.Cut(obj, centre, up,null,true,true);
+        Cutter.Cut(obj, centre, up,Mat,true,true);
     }
 }
